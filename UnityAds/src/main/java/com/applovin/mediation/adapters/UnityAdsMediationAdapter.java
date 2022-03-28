@@ -49,6 +49,8 @@ public class UnityAdsMediationAdapter
 {
     private static final String KEY_GAME_ID                  = "game_id";
     private static final String KEY_SET_MEDIATION_IDENTIFIER = "set_mediation_identifier";
+    private static final String KEY_ADAPTER_VERSION          = "adapter_version";
+    private static final String MEDIATION_TAG_ID             = "Max";
 
     private static final AtomicBoolean        initialized = new AtomicBoolean();
     private static       InitializationStatus initializationStatus;
@@ -74,13 +76,11 @@ public class UnityAdsMediationAdapter
             log( "Initializing UnityAds SDK with game id: " + gameId + "..." );
             initializationStatus = InitializationStatus.INITIALIZING;
 
-            if ( serverParameters.getBoolean( KEY_SET_MEDIATION_IDENTIFIER ) )
-            {
-                MediationMetaData mediationMetaData = new MediationMetaData( context );
-                mediationMetaData.setName( UnityAdsMediationAdapter.mediationTag() );
-                mediationMetaData.setVersion( AppLovinSdk.VERSION );
-                mediationMetaData.commit();
-            }
+            MediationMetaData mediationMetaData = new MediationMetaData( context );
+            mediationMetaData.setName( MEDIATION_TAG );
+            mediationMetaData.setVersion( UnityAds.getVersion() );
+            mediationMetaData.set( KEY_ADAPTER_VERSION, AppLovinSdk.VERSION );
+            mediationMetaData.commit();
 
             UnityAds.setDebugMode( parameters.isTesting() );
 
@@ -222,14 +222,6 @@ public class UnityAdsMediationAdapter
         String placementId = parameters.getThirdPartyAdPlacementId();
         log( "Loading " + ( AppLovinSdkUtils.isValidString( parameters.getBidResponse() ) ? "bidding " : "" ) + "rewarded ad for placement \"" + placementId + "\"..." );
 
-        if ( !UnityAds.isInitialized() )
-        {
-            log( "Unity Ads SDK is not initialized: failing rewarded ad load..." );
-            listener.onRewardedAdLoadFailed( MaxAdapterError.NOT_INITIALIZED );
-
-            return;
-        }
-
         updatePrivacyConsent( parameters, activity.getApplicationContext() );
 
         // Bidding ads need a random ID associated with each load and show
@@ -309,14 +301,6 @@ public class UnityAdsMediationAdapter
     {
         String placementId = parameters.getThirdPartyAdPlacementId();
         log( "Loading banner ad for placement \"" + placementId + "\"..." );
-
-        if ( !UnityAds.isInitialized() )
-        {
-            log( "Unity Ads SDK is not initialized: failing banner ad load..." );
-            listener.onAdViewAdLoadFailed( MaxAdapterError.NOT_INITIALIZED );
-
-            return;
-        }
 
         updatePrivacyConsent( parameters, activity.getApplicationContext() );
 
