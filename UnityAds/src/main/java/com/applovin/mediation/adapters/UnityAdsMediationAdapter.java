@@ -127,7 +127,6 @@ public class UnityAdsMediationAdapter
     {
         if ( loadedBannerAd != null )
         {
-            loadedBannerAd.destroy();
             loadedBannerAd = null;
         }
     }
@@ -491,6 +490,9 @@ public class UnityAdsMediationAdapter
         {
             UnityAds.setUserOptOut( isDoNotSell );
         }
+
+        // No COPPA trafic supported
+        UnityAds.setNonBehavioral(false);
     }
 
     private Context getContext(@Nullable final Activity activity)
