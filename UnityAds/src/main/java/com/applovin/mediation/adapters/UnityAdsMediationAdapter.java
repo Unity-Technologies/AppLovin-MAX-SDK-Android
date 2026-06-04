@@ -25,13 +25,10 @@ import com.unity3d.ads.BannerAd;
 import com.unity3d.ads.BannerConfiguration;
 import com.unity3d.ads.BannerShowListener;
 import com.unity3d.ads.BannerSize;
-import com.unity3d.ads.IUnityAdsTokenListener;
 import com.unity3d.ads.InitializationConfiguration;
-import com.unity3d.ads.InitializationListener;
 import com.unity3d.ads.InterstitialAd;
 import com.unity3d.ads.InterstitialShowListener;
 import com.unity3d.ads.LoadConfiguration;
-import com.unity3d.ads.LoadListener;
 import com.unity3d.ads.MediationInfo;
 import com.unity3d.ads.RewardedAd;
 import com.unity3d.ads.RewardedShowListener;
@@ -84,25 +81,20 @@ public class UnityAdsMediationAdapter
                     .withMediationInfo( createMediationInfo() )
                     .build();
 
-            UnityAds.initialize( config, new InitializationListener()
-            {
-                @Override
-                public void onInitializationComplete(@Nullable UnityAdsError error)
+            UnityAds.initialize( config, error -> {
+                if ( error == null )
                 {
-                    if ( error == null )
-                    {
-                        log( "UnityAds SDK initialized" );
-                        initializationStatus = InitializationStatus.INITIALIZED_SUCCESS;
-                        onCompletionListener.onCompletion( InitializationStatus.INITIALIZED_SUCCESS, null );
-                    }
-                    else
-                    {
-                        log( "UnityAds SDK failed to initialize with error: " + error.getMessage() );
-                        initializationStatus = InitializationStatus.INITIALIZED_FAILURE;
-                        onCompletionListener.onCompletion( InitializationStatus.INITIALIZED_FAILURE, error.getMessage() );
-                    }
+                    log( "UnityAds SDK initialized" );
+                    initializationStatus = InitializationStatus.INITIALIZED_SUCCESS;
+                    onCompletionListener.onCompletion( InitializationStatus.INITIALIZED_SUCCESS, null );
                 }
-            } );
+                else
+                {
+                    log( "UnityAds SDK failed to initialize with error: " + error.getMessage() );
+                    initializationStatus = InitializationStatus.INITIALIZED_FAILURE;
+                    onCompletionListener.onCompletion( InitializationStatus.INITIALIZED_FAILURE, error.getMessage() );
+                }
+            });
         }
         else
         {
@@ -139,15 +131,10 @@ public class UnityAdsMediationAdapter
         updatePrivacyConsent( parameters );
 
         AdFormat unityFormat = toUnityAdFormat( parameters );
-        UnityAds.getToken( new TokenConfiguration( unityFormat ), new IUnityAdsTokenListener()
-        {
-            @Override
-            public void onUnityAdsTokenReady(final String token)
-            {
-                log( "Collected signal" );
-                callback.onSignalCollected( token );
-            }
-        } );
+        UnityAds.getToken( new TokenConfiguration( unityFormat ), token -> {
+            log( "Collected signal" );
+            callback.onSignalCollected( token );
+        });
     }
 
     @Override
@@ -165,24 +152,19 @@ public class UnityAdsMediationAdapter
             builder.withAdMarkup( parameters.getBidResponse() );
         }
 
-        InterstitialAd.load( builder.build(), new LoadListener<InterstitialAd>()
-        {
-            @Override
-            public void onAdLoaded(@Nullable final InterstitialAd ad, @Nullable final UnityAdsError error)
+        InterstitialAd.load( builder.build(), (ad, error) -> {
+            if ( error == null )
             {
-                if ( error == null )
-                {
-                    log( "Interstitial placement \"" + placementId + "\" loaded" );
-                    loadedInterstitialAd = ad;
-                    listener.onInterstitialAdLoaded();
-                }
-                else
-                {
-                    log( "Interstitial placement \"" + placementId + "\" failed to load with error: " + error.getCode() + ": " + error.getMessage() );
-                    listener.onInterstitialAdLoadFailed( toMaxError( error ) );
-                }
+                log( "Interstitial placement \"" + placementId + "\" loaded" );
+                loadedInterstitialAd = ad;
+                listener.onInterstitialAdLoaded();
             }
-        } );
+            else
+            {
+                log( "Interstitial placement \"" + placementId + "\" failed to load with error: " + error.getCode() + ": " + error.getMessage() );
+                listener.onInterstitialAdLoadFailed( toMaxError( error ) );
+            }
+        });
     }
 
     @Override
@@ -191,6 +173,22 @@ public class UnityAdsMediationAdapter
         final String placementId = parameters.getThirdPartyAdPlacementId();
         log( "Showing interstitial ad for placement \"" + placementId + "\"..." );
 
+        if(loadedInterstitialAd == null) {
+            log( "Interstitial ad placement \"" + placementId + "\" failed to display with error: No Ad loaded" );
+            listener.onInterstitialAdDisplayFailed( new MaxAdapterError( MaxAdapterError.AD_DISPLAY_FAILED,
+                    -1,
+                    "No Ad Loaded") );
+            return;
+        }
+
+        if(activity == null) {
+            log("Interstitial ad placement \"" + placementId + "\" failed to display with error: Non null activity is needed");
+            listener.onInterstitialAdDisplayFailed(new MaxAdapterError(MaxAdapterError.AD_DISPLAY_FAILED,
+                    -1,
+                    "Non null activity is needed for ad display"));
+            return;
+        }
+        
         loadedInterstitialAd.show( activity, new ShowConfiguration.Builder().build(), new InterstitialShowListener()
         {
             @Override
@@ -240,24 +238,19 @@ public class UnityAdsMediationAdapter
             builder.withAdMarkup( parameters.getBidResponse() );
         }
 
-        RewardedAd.load( builder.build(), new LoadListener<RewardedAd>()
-        {
-            @Override
-            public void onAdLoaded(@Nullable final RewardedAd ad, @Nullable final UnityAdsError error)
+        RewardedAd.load( builder.build(), (ad, error) -> {
+            if ( error == null )
             {
-                if ( error == null )
-                {
-                    log( "Rewarded ad placement \"" + placementId + "\" loaded" );
-                    loadedRewardedAd = ad;
-                    listener.onRewardedAdLoaded();
-                }
-                else
-                {
-                    log( "Rewarded ad placement \"" + placementId + "\" failed to load with error: " + error.getCode() + ": " + error.getMessage() );
-                    listener.onRewardedAdLoadFailed( toMaxError( error ) );
-                }
+                log( "Rewarded ad placement \"" + placementId + "\" loaded" );
+                loadedRewardedAd = ad;
+                listener.onRewardedAdLoaded();
             }
-        } );
+            else
+            {
+                log( "Rewarded ad placement \"" + placementId + "\" failed to load with error: " + error.getCode() + ": " + error.getMessage() );
+                listener.onRewardedAdLoadFailed( toMaxError( error ) );
+            }
+        });
     }
 
     @Override
@@ -267,8 +260,24 @@ public class UnityAdsMediationAdapter
         log( "Showing rewarded ad for placement \"" + placementId + "\"..." );
 
         configureReward( parameters );
-
-        loadedRewardedAd.show( activity, new ShowConfiguration.Builder().build(), new RewardedShowListener()
+        
+        if(loadedRewardedAd == null) {
+            log( "Rewarded ad placement \"" + placementId + "\" failed to display with error: No Ad loaded" );
+            listener.onRewardedAdDisplayFailed( new MaxAdapterError( MaxAdapterError.AD_DISPLAY_FAILED,
+                    -1,
+                    "No Ad Loaded") );
+            return;
+        }
+        
+        if(activity == null) {
+            log("Rewarded ad placement \"" + placementId + "\" failed to display with error: Non null activity is needed");
+            listener.onRewardedAdDisplayFailed(new MaxAdapterError(MaxAdapterError.AD_DISPLAY_FAILED,
+                    -1,
+                    "Non null activity is needed for ad display"));
+            return;
+        }
+        
+        loadedRewardedAd.show(activity, new ShowConfiguration.Builder().build(), new RewardedShowListener()
         {
             @Override
             public void onStarted(@NonNull final RewardedAd ad)
@@ -363,24 +372,19 @@ public class UnityAdsMediationAdapter
             builder.withAdMarkup( parameters.getBidResponse() );
         }
 
-        BannerAd.load( builder.build(), new LoadListener<BannerAd>()
-        {
-            @Override
-            public void onAdLoaded(@Nullable final BannerAd ad, @Nullable final UnityAdsError error)
+        BannerAd.load( builder.build(), (ad, error) -> {
+            if ( error == null)
             {
-                if ( error == null )
-                {
-                    log( adFormat.getLabel() + " ad placement \"" + placementId + "\" loaded" );
-                    loadedBannerAd = ad;
-                    listener.onAdViewAdLoaded( ad.getView() );
-                }
-                else
-                {
-                    log( adFormat.getLabel() + " ad placement \"" + placementId + "\" failed to load with error: " + error.getCode() + ": " + error.getMessage() );
-                    listener.onAdViewAdLoadFailed( toMaxError( error ) );
-                }
+                log( adFormat.getLabel() + " ad placement \"" + placementId + "\" loaded" );
+                loadedBannerAd = ad;
+                listener.onAdViewAdLoaded(ad != null ? ad.getView() : null);
             }
-        } );
+            else
+            {
+                log( adFormat.getLabel() + " ad placement \"" + placementId + "\" failed to load with error: " + error.getCode() + ": " + error.getMessage() );
+                listener.onAdViewAdLoadFailed( toMaxError( error ) );
+            }
+        });
     }
 
     private MediationInfo createMediationInfo()
@@ -447,7 +451,7 @@ public class UnityAdsMediationAdapter
     {
         final float screenHeightDp = context.getResources().getDisplayMetrics().heightPixels
                 / context.getResources().getDisplayMetrics().density;
-        return (int) Math.min( 90, Math.max( 50, Math.round( screenHeightDp * 0.15f ) ) );
+        return Math.min( 90, Math.max( 50, Math.round( screenHeightDp * 0.15f ) ) );
     }
 
     private MaxAdapterError toMaxError(final UnityAdsError error)
@@ -490,14 +494,5 @@ public class UnityAdsMediationAdapter
         {
             UnityAds.setUserOptOut( isDoNotSell );
         }
-
-        // No COPPA trafic supported
-        UnityAds.setNonBehavioral(false);
-    }
-
-    private Context getContext(@Nullable final Activity activity)
-    {
-        // NOTE: `activity` can only be null in 11.1.0+, and `getApplicationContext()` is introduced in 11.1.0
-        return ( activity != null ) ? activity.getApplicationContext() : getApplicationContext();
     }
 }
