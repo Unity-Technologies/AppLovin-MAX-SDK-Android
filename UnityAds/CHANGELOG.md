@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.18.1.0
+* Certified with UnityAds SDK 4.18.1.
+
+## 4.18.0.0
+* Certified with UnityAds SDK 4.18.0.
+
 ## 4.17.0.1
 * Added adaptive banner support (anchored and inline).
 
