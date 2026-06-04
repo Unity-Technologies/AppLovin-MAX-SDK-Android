@@ -1,6 +1,2 @@
 include ':app'
-include ':UnityAds'
-project(':UnityAds').projectDir = new File('../UnityAds')
-include ':Google'
-project(':Google').projectDir = new File('../Google')
 rootProject.name='AppLovin MAX Demo App - Kotlin'

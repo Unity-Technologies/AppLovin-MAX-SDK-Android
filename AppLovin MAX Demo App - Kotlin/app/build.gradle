@@ -70,7 +70,4 @@ dependencies {
     } else {
         implementation("com.applovin:applovin-sdk:+@aar")
     }
-
-    implementation(project(":UnityAds"))
-    implementation(project(":Google"))
 }
