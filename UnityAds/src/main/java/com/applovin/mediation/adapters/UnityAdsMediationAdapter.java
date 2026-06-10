@@ -420,7 +420,8 @@ public class UnityAdsMediationAdapter
                 return new UnityBannerSize( width, getAdaptiveMaxHeight( context ) );
             }
 
-            final int anchoredHeight = MaxAdFormat.BANNER.getAdaptiveSize( width, context ).getHeight();
+            final AppLovinSdkUtils.Size appSize = MaxAdFormat.BANNER.getAdaptiveSize( width, context );
+            final int anchoredHeight = appSize == null ? 0 : appSize.getHeight();
             return new UnityBannerSize( width, anchoredHeight );
         }
 
