@@ -449,9 +449,14 @@ public class UnityAdsMediationAdapter
 
     private int getAdaptiveMaxHeight(final Context context)
     {
-        final float screenHeightDp = context.getResources().getDisplayMetrics().heightPixels
-                / context.getResources().getDisplayMetrics().density;
-        return (int) Math.min( 90, Math.max( 50, Math.round( screenHeightDp * 0.15f ) ) );
+        final float screenHeightDp;
+        if(context == null || context.getResources() == null || context.getResources().getDisplayMetrics() == null) {
+            screenHeightDp = 0;
+        } else {
+            screenHeightDp = (float) context.getResources().getDisplayMetrics().heightPixels
+                    / context.getResources().getDisplayMetrics().density;
+        }
+        return Math.min( 90, Math.max( 50, Math.round( screenHeightDp * 0.15f ) ) );
     }
 
     private static MaxAdapterError toMaxError(final BannerErrorInfo unityAdsBannerError)
