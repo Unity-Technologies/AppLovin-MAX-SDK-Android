@@ -432,8 +432,9 @@ public class UnityAdsMediationAdapter
                 return new BannerSize( width, getAdaptiveMaxHeight( context ) );
             }
 
-            final int anchoredHeight = MaxAdFormat.BANNER.getAdaptiveSize( width, context ).getHeight();
-            return new BannerSize( width, anchoredHeight );
+            final AppLovinSdkUtils.Size appSize = MaxAdFormat.BANNER.getAdaptiveSize( width, context );
+            final int anchoredHeight = appSize == null ? 0 : appSize.getHeight();
+            return new UnityBannerSize( width, anchoredHeight );
         }
 
         return toBannerSize( adFormat );
@@ -449,8 +450,13 @@ public class UnityAdsMediationAdapter
 
     private int getAdaptiveMaxHeight(final Context context)
     {
-        final float screenHeightDp = context.getResources().getDisplayMetrics().heightPixels
-                / context.getResources().getDisplayMetrics().density;
+        final float screenHeightDp;
+        if(context == null || context.getResources() == null || context.getResources().getDisplayMetrics() == null) {
+            screenHeightDp = 0;
+        } else {
+            screenHeightDp = (float) context.getResources().getDisplayMetrics().heightPixels
+                    / context.getResources().getDisplayMetrics().density;
+        }
         return Math.min( 90, Math.max( 50, Math.round( screenHeightDp * 0.15f ) ) );
     }
 
