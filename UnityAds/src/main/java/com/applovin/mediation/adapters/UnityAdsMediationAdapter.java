@@ -37,18 +37,15 @@ import com.unity3d.ads.ShowFinishState;
 import com.unity3d.ads.TokenConfiguration;
 import com.unity3d.ads.UnityAds;
 import com.unity3d.ads.UnityAdsError;
-import com.unity3d.ads.UnityAdsExperimental;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.OptIn;
 
 /**
  * This is a mediation adapterWrapper for the Unity Ads SDK
  */
-@OptIn( markerClass = UnityAdsExperimental.class )
 public class UnityAdsMediationAdapter
         extends MediationAdapterBase
         implements MaxSignalProvider, MaxInterstitialAdapter, MaxRewardedAdapter, MaxAdViewAdapter
