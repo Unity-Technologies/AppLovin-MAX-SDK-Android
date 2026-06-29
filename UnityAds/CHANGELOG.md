@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.19.0.0
+* Certified with UnityAds SDK 4.19.0.
+
 ## 4.18.1.1
 * Migrated to Unity Ads SDK 4.x new API (`InitializationConfiguration`, `InterstitialAd`, `RewardedAd`, `BannerAd`, `LoadConfiguration`, `ShowConfiguration`).
 * Added adaptive banner support (anchored and inline).
