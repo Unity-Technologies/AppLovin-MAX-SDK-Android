@@ -472,7 +472,7 @@ public class UnityAdsMediationAdapter
     private int getAdaptiveMaxHeight(final Context context)
     {
         final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        final float screenHeightDp = displayMetrics.heightPixels / displayMetrics.density;
+        final int screenHeightDp = AppLovinSdkUtils.pxToDp( context, displayMetrics.heightPixels );
         return Math.min( 90, Math.max( 50, Math.round( screenHeightDp * 0.15f ) ) );
     }
 
