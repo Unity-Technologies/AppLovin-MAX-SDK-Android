@@ -3,7 +3,6 @@ package com.applovin.mediation.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 
 import com.applovin.mediation.MaxAdFormat;
 import com.applovin.mediation.adapter.MaxAdViewAdapter;
@@ -56,11 +55,6 @@ public class UnityAdsMediationAdapter
 {
     private static final AtomicBoolean        initialized = new AtomicBoolean();
     private static       InitializationStatus initializationStatus;
-
-    // Bounds used to derive an inline adaptive banner height when the publisher does not specify a maximum height
-    private static final float INLINE_ADAPTIVE_SCREEN_HEIGHT_RATIO = 0.15f;
-    private static final int   INLINE_ADAPTIVE_MIN_HEIGHT_DP       = 50;
-    private static final int   INLINE_ADAPTIVE_MAX_HEIGHT_DP       = 90;
 
     private InterstitialAd interstitialAd;
     private RewardedAd     rewardedAd;
@@ -473,6 +467,7 @@ public class UnityAdsMediationAdapter
     {
         final int adaptiveAdWidth = getAdaptiveAdViewWidth( parameters, context );
 
+        // NOTE: Unity Ads banner sizes are fixed - `BannerSize` has no notion of a maximum height, so the requested height is the height that gets rendered. An unspecified inline maximum height therefore falls back to the anchored size below instead of the device height, which would ask Unity Ads for a screen-height banner.
         if ( isInlineAdaptiveAdView( parameters ) )
         {
             final int inlineMaximumHeight = getInlineAdaptiveAdViewMaximumHeight( parameters );
@@ -480,23 +475,11 @@ public class UnityAdsMediationAdapter
             {
                 return new BannerSize( adaptiveAdWidth, inlineMaximumHeight );
             }
-
-            // If not specified, use the maximum adaptive height for the current device
-            return new BannerSize( adaptiveAdWidth, getAdaptiveMaxHeight( context ) );
         }
 
         // Return anchored size by default
         final int anchoredHeight = MaxAdFormat.BANNER.getAdaptiveSize( adaptiveAdWidth, context ).getHeight();
         return new BannerSize( adaptiveAdWidth, anchoredHeight );
-    }
-
-    // NOTE: Unity Ads banner sizes are fixed - `BannerSize` has no notion of a maximum height, so the requested height is the height that gets rendered. When the publisher does not specify an inline maximum height we therefore derive a banner-appropriate height from the screen instead of requesting the full device height, which would ask Unity Ads for a screen-height banner.
-    private int getAdaptiveMaxHeight(final Context context)
-    {
-        final DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        final int screenHeightDp = AppLovinSdkUtils.pxToDp( context, displayMetrics.heightPixels );
-        final int adaptiveHeightDp = Math.round( screenHeightDp * INLINE_ADAPTIVE_SCREEN_HEIGHT_RATIO );
-        return Math.min( INLINE_ADAPTIVE_MAX_HEIGHT_DP, Math.max( INLINE_ADAPTIVE_MIN_HEIGHT_DP, adaptiveHeightDp ) );
     }
 
     private Context getContext(@Nullable final Activity activity)
