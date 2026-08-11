@@ -457,13 +457,13 @@ public class UnityAdsMediationAdapter
         // NOTE: Unity Ads does not support adaptive MRECs
         if ( isAdaptiveAdViewEnabled && adFormat != MaxAdFormat.MREC && isAdaptiveAdViewFormat( adFormat, parameters ) )
         {
-            return getAdaptiveBannerSize( parameters, context );
+            return getAdaptiveAdSize( parameters, context );
         }
 
         return toUnityBannerSize( adFormat );
     }
 
-    private BannerSize getAdaptiveBannerSize(final MaxAdapterParameters parameters, final Context context)
+    private BannerSize getAdaptiveAdSize(final MaxAdapterParameters parameters, final Context context)
     {
         final int adaptiveAdWidth = getAdaptiveAdViewWidth( parameters, context );
 
@@ -480,12 +480,6 @@ public class UnityAdsMediationAdapter
         // Return anchored size by default
         final int anchoredHeight = MaxAdFormat.BANNER.getAdaptiveSize( adaptiveAdWidth, context ).getHeight();
         return new BannerSize( adaptiveAdWidth, anchoredHeight );
-    }
-
-    private Context getContext(@Nullable final Activity activity)
-    {
-        // NOTE: `activity` can only be null in 11.1.0+, and `getApplicationContext()` is introduced in 11.1.0
-        return ( activity != null ) ? activity.getApplicationContext() : getApplicationContext();
     }
 
     private BannerSize toUnityBannerSize(final MaxAdFormat adFormat)
@@ -506,6 +500,12 @@ public class UnityAdsMediationAdapter
         {
             throw new IllegalArgumentException( "Unsupported ad format: " + adFormat );
         }
+    }
+
+    private Context getContext(@Nullable final Activity activity)
+    {
+        // NOTE: `activity` can only be null in 11.1.0+, and `getApplicationContext()` is introduced in 11.1.0
+        return ( activity != null ) ? activity.getApplicationContext() : getApplicationContext();
     }
 
     private static MaxAdapterError toMaxError(final UnityAdsError unityAdsError)
