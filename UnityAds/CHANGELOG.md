@@ -1,7 +1,19 @@
 # Changelog
 
-## 4.19.0.2
-* Add support for [adaptive banners](https://developers.applovin.com/en/max/android/ad-formats/banner-and-mrec-ads#adaptive-banners) & [inline adaptive banners](https://developers.applovin.com/en/max/android/ad-formats/banner-and-mrec-ads#inline-adaptive-banners). Inline adaptive MRECs are not supported by Unity Ads. Requires AppLovin MAX SDK 13.2.0 or higher.
+## 4.21.0.1
+* Add support for [adaptive banners](https://support.axon.ai/en/max/android/ad-formats/banner-and-mrec-ads#adaptive-banners) & [inline adaptive banners](https://support.axon.ai/en/max/android/ad-formats/banner-and-mrec-ads#inline-adaptive-banners). MRECs are not supported. Requires AppLovin MAX SDK 13.2.0 or higher.
+
+## 4.21.0.0
+* Certified with UnityAds SDK 4.21.0.
+
+## 4.20.1.1
+* Remove ProGuard rules since they are included in UnityAds' libraries.
+
+## 4.20.1.0
+* Certified with UnityAds SDK 4.20.1.
+
+## 4.20.0.0
+* Certified with UnityAds SDK 4.20.0.
 
 ## 4.19.0.1
 * Updated to use new APIs introduced in UnityAds SDK 4.19.0.

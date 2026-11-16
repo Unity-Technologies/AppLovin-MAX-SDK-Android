@@ -1,5 +1,20 @@
 # Changelog
 
+## 4.14.1.0
+* Certified with Moloco SDK 4.14.1.
+
+## 4.14.0.0
+* Certified with Moloco SDK 4.14.0.
+
+## 4.13.0.1
+* Added support for adaptive banners and reporting loaded banner dimensions to MAX.
+
+## 4.13.0.0
+* Certified with Moloco SDK 4.13.0.
+
+## 4.12.0.0
+* Certified with Moloco SDK 4.12.0.
+
 ## 4.11.1.0
 * Certified with Moloco SDK 4.11.1.
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13.1.0
+* Certified with MobileFuse SDK 1.13.1.
+
+## 1.13.0.0
+* Certified with MobileFuse SDK 1.13.0.
+
 ## 1.12.0.0
 * Certified with MobileFuse SDK 1.12.0.
 

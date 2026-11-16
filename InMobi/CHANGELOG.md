@@ -1,5 +1,25 @@
 # Changelog
 
+## 11.5.1.0
+* Certified with InMobi SDK 11.5.1.
+## 11.5.0.1
+* Restore ProGuard rules to fix dependency detection issues in the Mediation Debugger.
+
+## 11.5.0.0
+* Certified with InMobi SDK 11.5.0.
+
+## 11.4.1.3
+* Remove ProGuard rules since they are included in InMobi's libraries.
+
+## 11.4.1.2
+* Add setMute support for interstitial and rewarded ads.
+
+## 11.4.1.1
+* Fix adaptive banner layout to use the standard banner size while continuing to pass adaptive dimensions through extras.
+
+## 11.4.1.0
+* Certified with InMobi SDK 11.4.1.
+
 ## 11.4.0.0
 * Certified with InMobi SDK 11.4.0.
 

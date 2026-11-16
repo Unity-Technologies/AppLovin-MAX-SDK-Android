@@ -283,8 +283,12 @@ public class InMobiMediationAdapter
             }
 
             adView.setListener( new AdViewListener( listener, width, height ) );
-            adView.setLayoutParams( new LinearLayout.LayoutParams( Math.round( width * density ),
-                                                                   Math.round( height * density ) ) );
+
+            // InMobi expects the standard banner size in the layout request and reads adaptive
+            // dimensions from extras (ab-ad-slot / ab-type).
+            final AppLovinSdkUtils.Size standardSize = adFormat.getSize();
+            adView.setLayoutParams( new LinearLayout.LayoutParams( Math.round( standardSize.getWidth() * density ),
+                                                                   Math.round( standardSize.getHeight() * density ) ) );
 
             if ( isBiddingAd )
             {
@@ -314,6 +318,8 @@ public class InMobiMediationAdapter
 
             return;
         }
+
+        updateMuteState( parameters.getServerParameters() );
 
         interstitialAd = loadFullscreenAd( placementId, parameters, new InterstitialListener( listener ), activity );
     }
@@ -350,6 +356,8 @@ public class InMobiMediationAdapter
 
             return;
         }
+
+        updateMuteState( parameters.getServerParameters() );
 
         rewardedAd = loadFullscreenAd( placementId, parameters, new RewardedAdListener( listener ), activity );
     }
@@ -478,6 +486,14 @@ public class InMobiMediationAdapter
         if ( isDoNotSell != null )
         {
             InMobiPrivacyCompliance.setDoNotSell( isDoNotSell );
+        }
+    }
+
+    private static void updateMuteState(final Bundle serverParameters)
+    {
+        if ( serverParameters.containsKey( "is_muted" ) )
+        {
+            InMobiSdk.setApplicationMuted( serverParameters.getBoolean( "is_muted" ) );
         }
     }
 

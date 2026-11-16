@@ -144,7 +144,6 @@ public class UnityAdsMediationAdapter
 
         if ( adFormat.isAdViewAd() )
         {
-            // NOTE: Placement-level settings are not available in the server parameters during signal collection, so the adaptive banner flag is read from the local extra parameters
             Object isAdaptiveBannerObj = parameters.getLocalExtraParameters().get( "adaptive_banner" );
             boolean isAdaptiveAdViewEnabled = isAdaptiveBannerObj instanceof String && "true".equalsIgnoreCase( (String) isAdaptiveBannerObj );
 
@@ -443,45 +442,6 @@ public class UnityAdsMediationAdapter
         return new MediationInfo( "MAX", AppLovinSdk.VERSION, getAdapterVersion() );
     }
 
-    private BannerSize toUnityBannerSize(final MaxAdFormat adFormat,
-                                         boolean isAdaptiveAdViewEnabled,
-                                         final MaxAdapterParameters parameters,
-                                         final Context context)
-    {
-        if ( isAdaptiveAdViewEnabled && AppLovinSdk.VERSION_CODE < 13_02_00_99 )
-        {
-            userError( "Please update AppLovin MAX SDK to version 13.2.0 or higher in order to use Unity Ads adaptive ads" );
-            isAdaptiveAdViewEnabled = false;
-        }
-
-        // NOTE: Unity Ads does not support adaptive MRECs
-        if ( isAdaptiveAdViewEnabled && adFormat != MaxAdFormat.MREC && isAdaptiveAdViewFormat( adFormat, parameters ) )
-        {
-            return getAdaptiveAdSize( parameters, context );
-        }
-
-        return toUnityBannerSize( adFormat );
-    }
-
-    private BannerSize getAdaptiveAdSize(final MaxAdapterParameters parameters, final Context context)
-    {
-        final int adaptiveAdWidth = getAdaptiveAdViewWidth( parameters, context );
-
-        // NOTE: Unity Ads banner sizes are fixed - `BannerSize` has no notion of a maximum height, so the requested height is the height that gets rendered. An unspecified inline maximum height therefore falls back to the anchored size below instead of the device height, which would ask Unity Ads for a screen-height banner.
-        if ( isInlineAdaptiveAdView( parameters ) )
-        {
-            final int inlineMaximumHeight = getInlineAdaptiveAdViewMaximumHeight( parameters );
-            if ( inlineMaximumHeight > 0 )
-            {
-                return new BannerSize( adaptiveAdWidth, inlineMaximumHeight );
-            }
-        }
-
-        // Return anchored size by default
-        final int anchoredHeight = MaxAdFormat.BANNER.getAdaptiveSize( adaptiveAdWidth, context ).getHeight();
-        return new BannerSize( adaptiveAdWidth, anchoredHeight );
-    }
-
     private BannerSize toUnityBannerSize(final MaxAdFormat adFormat)
     {
         if ( adFormat == MaxAdFormat.BANNER )
@@ -502,9 +462,47 @@ public class UnityAdsMediationAdapter
         }
     }
 
+    private BannerSize toUnityBannerSize(final MaxAdFormat adFormat,
+                                         boolean isAdaptiveAdViewEnabled,
+                                         final MaxAdapterParameters parameters,
+                                         final Context context)
+    {
+        if ( isAdaptiveAdViewEnabled && AppLovinSdk.VERSION_CODE < 13_02_00_99 )
+        {
+            userError( "Please update AppLovin MAX SDK to version 13.2.0 or higher in order to use Unity Ads adaptive ads" );
+            isAdaptiveAdViewEnabled = false;
+        }
+
+        // Unity Ads does not support adaptive MRECs
+        if ( isAdaptiveAdViewEnabled && adFormat != MaxAdFormat.MREC && isAdaptiveAdViewFormat( adFormat, parameters ) )
+        {
+            return getAdaptiveAdSize( parameters, context );
+        }
+
+        return toUnityBannerSize( adFormat );
+    }
+
+    private BannerSize getAdaptiveAdSize(final MaxAdapterParameters parameters, final Context context)
+    {
+        final int adaptiveAdWidth = getAdaptiveAdViewWidth( parameters, context );
+
+        if ( isInlineAdaptiveAdView( parameters ) )
+        {
+            final int inlineMaximumHeight = getInlineAdaptiveAdViewMaximumHeight( parameters );
+            if ( inlineMaximumHeight > 0 )
+            {
+                return new BannerSize( adaptiveAdWidth, inlineMaximumHeight );
+            }
+        }
+
+        // Return anchored size by default
+        final int anchoredHeight = MaxAdFormat.BANNER.getAdaptiveSize( adaptiveAdWidth, context ).getHeight();
+        return new BannerSize( adaptiveAdWidth, anchoredHeight );
+    }
+
     private Context getContext(@Nullable final Activity activity)
     {
-        // NOTE: `activity` can only be null in 11.1.0+, and `getApplicationContext()` is introduced in 11.1.0
+        // `activity` can only be null in 11.1.0+, and `getApplicationContext()` is introduced in 11.1.0
         return ( activity != null ) ? activity.getApplicationContext() : getApplicationContext();
     }
 
